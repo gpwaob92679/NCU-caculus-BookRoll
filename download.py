@@ -16,7 +16,8 @@ def save_images(session: requests.Session, save_path, url: str):
     page = 1
     while True:
         filename = f'out_{page}.jpg'
-        img_url = f'https://bookroll.org.tw/contents/unzipped/{content_id}_1/OPS/images/{filename}'
+        img_url = (f'https://bookroll.org.tw/contents/unzipped/{content_id}_1/'
+                   f'OPS/images/{filename}')
         print(img_url)
 
         r_img = session.get(img_url)
@@ -37,13 +38,19 @@ def main():
 
     login_url = 'https://brpt.bookroll.org.tw/login/index.php'
     r_login = session.get(login_url)
-    logintoken = BeautifulSoup(r_login.text, 'html.parser').find('input', {'name': 'logintoken'})['value']
+    logintoken = BeautifulSoup(r_login.text, 'html.parser').find(
+        'input', {'name': 'logintoken'})['value']
     username = input('Enter username: ')
     password = input('Enter password: ')
-    login_data = {'logintoken': logintoken, 'username': username, 'password': password}
+    login_data = {
+        'logintoken': logintoken,
+        'username': username,
+        'password': password
+    }
     r_login = session.post(login_url, data=login_data)
 
-    r_lti_redirect = session.get('https://brpt.bookroll.org.tw/mod/lti/launch.php?id=2911')
+    r_lti_redirect = session.get(
+        'https://brpt.bookroll.org.tw/mod/lti/launch.php?id=2911')
     r_lti_redirect_soup = BeautifulSoup(r_lti_redirect.text, 'html.parser')
     r_lti_redirect_inputs = r_lti_redirect_soup.find_all('input')
     r_lti_redirect_inputs_dict = dict()
@@ -51,7 +58,8 @@ def main():
         r_lti_redirect_inputs_dict[tag['name']] = tag['value']
     # print(r_lti_redirect_inputs_dict)
 
-    r_list = session.post(r_lti_redirect_soup.find('form')['action'], data=r_lti_redirect_inputs_dict)
+    r_list = session.post(r_lti_redirect_soup.find('form')['action'],
+                          data=r_lti_redirect_inputs_dict)
     r_list_soup = BeautifulSoup(r_list.text, 'html.parser')
     r_list_a = r_list_soup.find_all('a', href=True)
     for tag in r_list_a:
