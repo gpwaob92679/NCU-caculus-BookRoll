@@ -1,3 +1,4 @@
+from getpass import getpass
 from io import BytesIO
 import re
 
@@ -40,12 +41,12 @@ def main():
     r_login = session.get(login_url)
     logintoken = BeautifulSoup(r_login.text, 'html.parser').find(
         'input', {'name': 'logintoken'})['value']
-    username = input('Enter username: ')
-    password = input('Enter password: ')
+    username = input('Enter BookRoll username: ')
+    password = getpass('Enter BookRoll password: ')
     login_data = {
         'logintoken': logintoken,
         'username': username,
-        'password': password
+        'password': password,
     }
     r_login = session.post(login_url, data=login_data)
 
