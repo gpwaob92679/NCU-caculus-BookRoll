@@ -1,7 +1,7 @@
-# NCU 111-1 calculus BookRoll
+# NCU calculus BookRoll (111)
 
 This repository contains scripts to download and process BookRoll slides
-in the NCU 111-1 calculus course.
+in the NCU calculus course of year 111.
 
 Downloaded JPG files and merged PDF files are also included.
 
