@@ -1,5 +1,6 @@
 from getpass import getpass
 from io import BytesIO
+from pathlib import Path
 import re
 
 from bs4 import BeautifulSoup
@@ -15,10 +16,17 @@ class BookRollDownloader:
     def __init__(self):
         self.session = requests.Session()
 
-    def save_images(self, save_path, url: str):
+    def _download_image(self, save_file: Path, url: str) -> None:
+        r_img = self.session.get(url)
+        if r_img.text.startswith('<html'):  # Image not found
+            raise FileNotFoundError
+
+        img = Image.open(BytesIO(r_img.content))
+        img.save(save_file)
+
+    def _download_chapter(self, save_dir: Path, url: str) -> None:
         pattern = re.compile('(?<=contents=)[0-9a-f]*')
         content_id = pattern.search(url).group(0)
-        # print(content_id)
 
         page = 1
         while True:
@@ -28,13 +36,10 @@ class BookRollDownloader:
                 f'OPS/images/{filename}')
             print(img_url)
 
-            r_img = self.session.get(img_url)
-
-            if r_img.text.startswith('<html'):  # Image not found
+            try:
+                self._download_image(save_dir / filename, img_url)
+            except FileNotFoundError:
                 break
-
-            img = Image.open(BytesIO(r_img.content))
-            img.save(save_path / filename)
 
             page += 1
 
@@ -72,12 +77,12 @@ class BookRollDownloader:
             if match:
                 print(f'Saving "{tag.text}"...')
                 save_path = get_path(download_path / tag.text)
-                self.save_images(save_path, tag['href'])
+                self._download_chapter(save_path, tag['href'])
                 print('Done\n')
 
 
 def main():
-    download_path = get_path('./jpg2')
+    download_path = get_path('./jpg')
 
     downloader = BookRollDownloader()
     downloader.login()
