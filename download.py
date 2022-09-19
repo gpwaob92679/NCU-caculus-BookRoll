@@ -1,7 +1,9 @@
+import argparse
 from getpass import getpass
 from io import BytesIO
 from pathlib import Path
 import re
+from typing import Optional
 
 from bs4 import BeautifulSoup
 from PIL import Image
@@ -43,12 +45,19 @@ class BookRollDownloader:
 
             page += 1
 
-    def login(self):
+    def login(self,
+              username: Optional[str] = None,
+              password: Optional[str] = None) -> None:
+        if username is None:
+            print('BookRoll username not found in command-line arguments.')
+            username = input('Please enter your BookRoll username: ')
+        if password is None:
+            print('BookRoll password not found in command-line arguments.')
+            password = getpass('Please enter your BookRoll password: ')
+
         r_login = self.session.get(self.login_url)
         logintoken = BeautifulSoup(r_login.text, 'html.parser').find(
             'input', {'name': 'logintoken'})['value']
-        username = input('Enter BookRoll username: ')
-        password = getpass('Enter BookRoll password: ')
         login_data = {
             'logintoken': logintoken,
             'username': username,
@@ -82,10 +91,24 @@ class BookRollDownloader:
 
 
 def main():
-    download_path = get_path('./jpg')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--download_path',
+                        default='./jpg',
+                        type=str,
+                        help='Destination folder for downloaded files.')
+    parser.add_argument('--username',
+                        type=str,
+                        help='Username to log in to BookRoll.')
+    parser.add_argument('--password',
+                        type=str,
+                        help='Password to log in to BookRoll. Use this '
+                        'argument with CAUTION though, as it is NOT '
+                        'recommended to store passwords in plain text.')
+    args = parser.parse_args()
+    download_path = get_path(args.download_path)
 
     downloader = BookRollDownloader()
-    downloader.login()
+    downloader.login(args.username, args.password)
     downloader.download(download_path)
 
 
