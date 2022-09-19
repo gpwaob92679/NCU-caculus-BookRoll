@@ -14,9 +14,28 @@ from utils import *
 
 class BookRollDownloader:
     login_url = 'https://brpt.bookroll.org.tw/login/index.php'
+    rti_redirect_url = 'https://brpt.bookroll.org.tw/mod/lti/launch.php?id=2911'
 
     def __init__(self):
         self.session = requests.Session()
+
+    def _send_form(
+            self,
+            url: str,
+            form_attrs: Optional[dict[str, str]] = None,
+            form_inputs: Optional[dict[str, str]] = None) -> requests.Response:
+        request = self.session.get(url)
+        request_soup = BeautifulSoup(request.text, 'html.parser')
+        form = request_soup.find('form', form_attrs)
+
+        if form_inputs is None:
+            form_inputs = {}
+
+        for tag in form.find_all('input'):
+            if not tag['name'] in form_inputs:
+                form_inputs[tag['name']] = tag['value']
+
+        return self.session.post(form['action'], form_inputs)
 
     def _download_image(self, save_file: Path, url: str) -> None:
         r_img = self.session.get(url)
@@ -55,28 +74,13 @@ class BookRollDownloader:
             print('BookRoll password not found in command-line arguments.')
             password = getpass('Please enter your BookRoll password: ')
 
-        r_login = self.session.get(self.login_url)
-        logintoken = BeautifulSoup(r_login.text, 'html.parser').find(
-            'input', {'name': 'logintoken'})['value']
-        login_data = {
-            'logintoken': logintoken,
+        r_login = self._send_form(self.login_url, {'id': 'login'}, {
             'username': username,
-            'password': password,
-        }
-        r_login = self.session.post(self.login_url, data=login_data)
+            'password': password
+        })
 
     def download(self, download_path):
-        r_lti_redirect = self.session.get(
-            'https://brpt.bookroll.org.tw/mod/lti/launch.php?id=2911')
-        r_lti_redirect_soup = BeautifulSoup(r_lti_redirect.text, 'html.parser')
-        r_lti_redirect_inputs = r_lti_redirect_soup.find_all('input')
-        r_lti_redirect_inputs_dict = dict()
-        for tag in r_lti_redirect_inputs:
-            r_lti_redirect_inputs_dict[tag['name']] = tag['value']
-        # print(r_lti_redirect_inputs_dict)
-
-        r_list = self.session.post(r_lti_redirect_soup.find('form')['action'],
-                                   data=r_lti_redirect_inputs_dict)
+        r_list = self._send_form(self.rti_redirect_url, {'id': 'ltiLaunchForm'})
         r_list_soup = BeautifulSoup(r_list.text, 'html.parser')
         r_list_a = r_list_soup.find_all('a', href=True)
         for tag in r_list_a:
