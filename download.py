@@ -45,10 +45,7 @@ class BookRollDownloader:
         img = Image.open(BytesIO(r_img.content))
         img.save(save_file)
 
-    def _download_chapter(self, save_dir: Path, url: str) -> None:
-        pattern = re.compile('(?<=contents=)[0-9a-f]*')
-        content_id = pattern.search(url).group(0)
-
+    def _download_content(self, save_dir: Path, content_id: str) -> None:
         page = 1
         while True:
             filename = f'out_{page}.jpg'
@@ -59,7 +56,7 @@ class BookRollDownloader:
 
             try:
                 self._download_image(save_dir / filename, img_url)
-            except FileNotFoundError:
+            except FileNotFoundError:  # Reached the page after the last page
                 break
 
             page += 1
@@ -79,18 +76,21 @@ class BookRollDownloader:
             'password': password
         })
 
-    def download(self, download_path):
+    def download_slides(self, download_path: Path) -> None:
         r_list = self._send_form(self.rti_redirect_url, {'id': 'ltiLaunchForm'})
         r_list_soup = BeautifulSoup(r_list.text, 'html.parser')
         r_list_a = r_list_soup.find_all('a', href=True)
+
+        pattern_chapter_name = re.compile('第.*章')
+        pattern_content_id = re.compile('(?<=contents=)[0-9a-f]*')
         for tag in r_list_a:
             # print(tag)
-            pattern = re.compile('第.*章')
-            match = pattern.match(tag.text)
+            match = pattern_chapter_name.match(tag.text)
             if match:
+                content_id = pattern_content_id.search(tag['href']).group(0)
                 print(f'Saving "{tag.text}"...')
                 save_path = get_path(download_path / tag.text)
-                self._download_chapter(save_path, tag['href'])
+                self._download_content(save_path, content_id)
                 print('Done\n')
 
 
@@ -113,7 +113,7 @@ def main():
 
     downloader = BookRollDownloader()
     downloader.login(args.username, args.password)
-    downloader.download(download_path)
+    downloader.download_slides(download_path)
 
 
 if __name__ == '__main__':
