@@ -5,3 +5,4 @@ pikepdf
 Pillow
 pycnnum
 requests
+tqdm

@@ -1,5 +1,4 @@
 import argparse
-from deprecation import deprecated
 from getpass import getpass
 from io import BytesIO
 from pathlib import Path
@@ -8,8 +7,10 @@ import time
 from typing import Optional
 
 from bs4 import BeautifulSoup
+from deprecation import deprecated
 from PIL import Image
 import requests
+from tqdm import tqdm
 
 from utils import *
 
@@ -90,21 +91,33 @@ class BookRollDownloader:
             x for x in output_request.text[1:-1].replace('"', '').split(',')
         ]
 
+        print('Waiting for server to process file', end='')
         while True:
             output_state_request = self.session.post(
                 'https://bookroll.org.tw/book/pdfoutputstate/',
                 {'tmpFile': output_response[1]},
                 headers=csrf_header)
             if output_state_request.text == 'End':
+                print('Done')
                 break
+            print('.', end='')
             time.sleep(2)
 
         output_data_request = self.session.post(
             'https://bookroll.org.tw/book/pdfoutputdata/',
             data={'tmpFile': output_response[1]},
-            headers=csrf_header)
-        with open(save_file, 'wb') as f:
-            f.write(output_data_request.content)
+            headers=csrf_header,
+            stream=True)
+
+        with tqdm.wrapattr(
+                open(save_file, 'wb'),
+                'write',
+                desc=save_file.name,
+                total=int(output_data_request.headers['content-length']),
+                miniters=1,
+        ) as f:
+            for chunk in output_data_request.iter_content(1024):
+                f.write(chunk)
 
     def login(self,
               username: Optional[str] = None,
@@ -133,9 +146,9 @@ class BookRollDownloader:
             if match:
                 content_id = pattern_content_id.search(tag['href']).group(0)
                 filename = f'{tag.text}.pdf'
-                print(f'Saving "{filename}"...')
+                print(f'Downloading "{filename}"...')
                 self._download_content_pdf(download_path / filename, content_id)
-                print('Done\n')
+                print(f'Successfully downloaded "{filename}".\n')
 
 
 def main():
