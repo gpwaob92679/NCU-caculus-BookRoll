@@ -29,18 +29,18 @@ class BookRollDownloader:
             url: str,
             form_attrs: Optional[dict[str, str]] = None,
             form_inputs: Optional[dict[str, str]] = None) -> requests.Response:
-        request = self.session.get(url)
-        request_soup = BeautifulSoup(request.text, 'html.parser')
-        form = request_soup.find('form', form_attrs)
+        form_request = self.session.get(url)
+        form_request_soup = BeautifulSoup(form_request.text, 'html.parser')
+        form_tag = form_request_soup.find('form', form_attrs)
 
         if form_inputs is None:
             form_inputs = {}
 
-        for tag in form.find_all('input'):
+        for tag in form_tag.find_all('input'):
             if not tag['name'] in form_inputs:
                 form_inputs[tag['name']] = tag['value']
 
-        return self.session.post(form['action'], form_inputs)
+        return self.session.post(form_tag['action'], form_inputs)
 
     def _get_content_list(self):
         self.content_list_request = self._send_form(self.rti_redirect_url,
@@ -51,11 +51,11 @@ class BookRollDownloader:
                                                                    href=True)
 
     def _download_image(self, save_file: Path, url: str) -> None:
-        r_img = self.session.get(url)
-        if r_img.text.startswith('<html'):  # Image not found
+        img_request = self.session.get(url)
+        if img_request.text.startswith('<html'):  # Image not found
             raise FileNotFoundError
 
-        img = Image.open(BytesIO(r_img.content))
+        img = Image.open(BytesIO(img_request.content))
         img.save(save_file)
 
     @deprecated(details='Use _download_content_pdf instead to download '
@@ -116,7 +116,7 @@ class BookRollDownloader:
             print('BookRoll password not found in command-line arguments.')
             password = getpass('Please enter your BookRoll password: ')
 
-        r_login = self._send_form(self.login_url, {'id': 'login'}, {
+        login_request = self._send_form(self.login_url, {'id': 'login'}, {
             'username': username,
             'password': password
         })
