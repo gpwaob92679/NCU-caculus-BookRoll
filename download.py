@@ -18,6 +18,9 @@ class BookRollDownloader:
 
     def __init__(self):
         self.session = requests.Session()
+        self.content_list_request = None
+        self.content_list_soup = None
+        self.content_list_a_tags = None
 
     def _send_form(
             self,
@@ -36,6 +39,14 @@ class BookRollDownloader:
                 form_inputs[tag['name']] = tag['value']
 
         return self.session.post(form['action'], form_inputs)
+
+    def _get_content_list(self):
+        self.content_list_request = self._send_form(self.rti_redirect_url,
+                                                    {'id': 'ltiLaunchForm'})
+        self.content_list_soup = BeautifulSoup(self.content_list_request.text,
+                                               'html.parser')
+        self.content_list_a_tags = self.content_list_soup.find_all('a',
+                                                                   href=True)
 
     def _download_image(self, save_file: Path, url: str) -> None:
         r_img = self.session.get(url)
@@ -76,14 +87,13 @@ class BookRollDownloader:
             'password': password
         })
 
-    def download_slides(self, download_path: Path) -> None:
-        r_list = self._send_form(self.rti_redirect_url, {'id': 'ltiLaunchForm'})
-        r_list_soup = BeautifulSoup(r_list.text, 'html.parser')
-        r_list_a = r_list_soup.find_all('a', href=True)
+        self._get_content_list()
 
+    def download_slides(self, download_path: Path) -> None:
         pattern_chapter_name = re.compile('第.*章')
         pattern_content_id = re.compile('(?<=contents=)[0-9a-f]*')
-        for tag in r_list_a:
+
+        for tag in self.content_list_a_tags:
             # print(tag)
             match = pattern_chapter_name.match(tag.text)
             if match:
