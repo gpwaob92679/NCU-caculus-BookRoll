@@ -1,8 +1,10 @@
 import argparse
+from deprecation import deprecated
 from getpass import getpass
 from io import BytesIO
 from pathlib import Path
 import re
+import time
 from typing import Optional
 
 from bs4 import BeautifulSoup
@@ -56,7 +58,9 @@ class BookRollDownloader:
         img = Image.open(BytesIO(r_img.content))
         img.save(save_file)
 
-    def _download_content(self, save_dir: Path, content_id: str) -> None:
+    @deprecated(details='Use _download_content_pdf instead to download '
+                'higher-quality PDFs directly from the server.')
+    def _download_content_images(self, save_dir: Path, content_id: str) -> None:
         page = 1
         while True:
             filename = f'out_{page}.jpg'
@@ -71,6 +75,36 @@ class BookRollDownloader:
                 break
 
             page += 1
+
+    def _download_content_pdf(self, save_file: Path, content_id: str) -> None:
+        header = self.content_list_soup.find('meta',
+                                             {'id': '_csrf_header'})['content']
+        token = self.content_list_soup.find('meta', {'id': '_csrf'})['content']
+        csrf_header = {header: token}
+
+        output_request = self.session.post(
+            'https://bookroll.org.tw/book/pdfoutput/',
+            {'viewerUrl': content_id},
+            headers=csrf_header)
+        output_response = [
+            x for x in output_request.text[1:-1].replace('"', '').split(',')
+        ]
+
+        while True:
+            output_state_request = self.session.post(
+                'https://bookroll.org.tw/book/pdfoutputstate/',
+                {'tmpFile': output_response[1]},
+                headers=csrf_header)
+            if output_state_request.text == 'End':
+                break
+            time.sleep(2)
+
+        output_data_request = self.session.post(
+            'https://bookroll.org.tw/book/pdfoutputdata/',
+            data={'tmpFile': output_response[1]},
+            headers=csrf_header)
+        with open(save_file, 'wb') as f:
+            f.write(output_data_request.content)
 
     def login(self,
               username: Optional[str] = None,
@@ -98,16 +132,16 @@ class BookRollDownloader:
             match = pattern_chapter_name.match(tag.text)
             if match:
                 content_id = pattern_content_id.search(tag['href']).group(0)
-                print(f'Saving "{tag.text}"...')
-                save_path = get_path(download_path / tag.text)
-                self._download_content(save_path, content_id)
+                filename = f'{tag.text}.pdf'
+                print(f'Saving "{filename}"...')
+                self._download_content_pdf(download_path / filename, content_id)
                 print('Done\n')
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--download_path',
-                        default='./jpg',
+                        default='./pdf',
                         type=str,
                         help='Destination folder for downloaded files.')
     parser.add_argument('--username',
