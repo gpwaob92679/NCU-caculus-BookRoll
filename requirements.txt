@@ -1,6 +1,7 @@
 beautifulsoup4
 deprecation
 img2pdf
-pycnnum
+pikepdf
 Pillow
+pycnnum
 requests
