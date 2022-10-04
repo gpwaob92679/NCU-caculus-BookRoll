@@ -1,9 +1,9 @@
-# NCU calculus BookRoll (111)
+# NCU Calculus BookRoll (111)
 
 This repository contains scripts to download and process BookRoll slides
 in the NCU calculus course of year 111.
 
-Fixed PDF files are also included.
+Processed PDF files of slides are included in [another repository](https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/).
 
 ## Processed Files
 
@@ -27,21 +27,21 @@ The table below contains links to processed PDF files for easy access.
 | Chapter 14 - Partial Derivatives                         | [PDF][Ch14PDF] |
 | Chapter 15 - Multiple Integrals                          | [PDF][Ch15PDF] |
 
-[Ch1PDF]: pdf/Chapter%201%20-%20Functions.pdf
-[Ch2PDF]: pdf/Chapter%202%20-%20Limits%20and%20Continuity.pdf
-[Ch3PDF]: pdf/Chapter%203%20-%20Derivatives.pdf
-[Ch4PDF]: pdf/Chapter%204%20-%20Applications%20of%20Derivatives.pdf
-[Ch5PDF]: pdf/Chapter%205%20-%20Integrals.pdf
-[Ch6PDF]: pdf/Chapter%206%20-%20Applications%20of%20Definite%20Integrals.pdf
-[Ch7PDF]: pdf/Chapter%207%20-%20Transcendental%20Functions.pdf
-[Ch8PDF]: pdf/Chapter%208%20-%20Techniques%20of%20Integration.pdf
-[Ch9PDF]: pdf/Chapter%209%20-%20First-Order%20Differential%20Equations.pdf
-[Ch10PDF]: pdf/Chapter%2010%20-%20Infinite%20Sequences%20and%20Series.pdf
-[Ch11PDF]: pdf/Chapter%2011%20-%20Parametric%20Equations%20and%20Polar%20Coordinates.pdf
-[Ch12PDF]: pdf/Chapter%2012%20-%20Vectors%20and%20the%20Geometry%20of%20Space.pdf
-[Ch13PDF]: pdf/Chapter%2013%20-%20Vector-Valued%20Functions%20and%20Motion%20in%20Space.pdf
-[Ch14PDF]: pdf/Chapter%2014%20-%20Partial%20Derivatives.pdf
-[Ch15PDF]: pdf/Chapter%2015%20-%20Multiple%20Integrals.pdf
+[Ch1PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%201%20-%20Functions.pdf
+[Ch2PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%202%20-%20Limits%20and%20Continuity.pdf
+[Ch3PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%203%20-%20Derivatives.pdf
+[Ch4PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%204%20-%20Applications%20of%20Derivatives.pdf
+[Ch5PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%205%20-%20Integrals.pdf
+[Ch6PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%206%20-%20Applications%20of%20Definite%20Integrals.pdf
+[Ch7PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%207%20-%20Transcendental%20Functions.pdf
+[Ch8PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%208%20-%20Techniques%20of%20Integration.pdf
+[Ch9PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%209%20-%20First-Order%20Differential%20Equations.pdf
+[Ch10PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%2010%20-%20Infinite%20Sequences%20and%20Series.pdf
+[Ch11PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%2011%20-%20Parametric%20Equations%20and%20Polar%20Coordinates.pdf
+[Ch12PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%2012%20-%20Vectors%20and%20the%20Geometry%20of%20Space.pdf
+[Ch13PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%2013%20-%20Vector-Valued%20Functions%20and%20Motion%20in%20Space.pdf
+[Ch14PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%2014%20-%20Partial%20Derivatives.pdf
+[Ch15PDF]: https://github.com/gpwaob92679/NCU-calculus-BookRoll-resources/blob/main/pdf/Chapter%2015%20-%20Multiple%20Integrals.pdf
 
 ## Running the scripts
 
